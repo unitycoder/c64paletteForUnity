@@ -1,5 +1,7 @@
 # C64 Palette Post Processing (URP)
 
+<img width="2560" height="1400" alt="image" src="https://github.com/user-attachments/assets/5bcd18dc-99b2-431a-b32b-af8037de841f" />
+
 A Commodore 64-inspired palette quantization effect for **Unity 6 / Universal Render Pipeline (URP)** using **Render Graph**. It maps camera colors to the nearest entry in a 16 x 1 palette, with optional ordered dithering, pixelation, and Volume-controlled color adjustments.
 
 ![C64 palette](Runtime/Resources/C64Palette16.png)
