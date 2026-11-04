@@ -1,0 +1,35 @@
+name: Validate UPM package
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check package metadata and palette
+        shell: python
+        run: |
+          import json
+          import pathlib
+          import struct
+          root = pathlib.Path('.')
+          data = json.loads((root / 'package.json').read_text(encoding='utf-8'))
+          assert data['name'] == 'com.unitycoder.c64palette'
+          assert data['version']
+          assert data['dependencies']['com.unity.render-pipelines.universal']
+          for path in [
+              'Runtime/UnityCoder.C64Palette.asmdef',
+              'Runtime/C64PaletteRendererFeature.cs',
+              'Runtime/C64PaletteVolume.cs',
+              'Runtime/Resources/C64PaletteQuantize.shader',
+              'Runtime/Resources/C64Palette16.png',
+          ]:
+              assert (root / path).is_file(), path
+              assert (root / (path + '.meta')).is_file(), path + '.meta'
+          png = (root / 'Runtime/Resources/C64Palette16.png').read_bytes()
+          assert png[:8] == b'\x89PNG\r\n\x1a\n'
+          assert struct.unpack('>II', png[16:24]) == (16, 1)
+          print('Manifest, sources, asset metadata and 16x1 PNG validated.')

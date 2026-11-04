@@ -1,0 +1,26 @@
+{
+  "name": "com.unitycoder.c64palette",
+  "version": "1.0.0",
+  "displayName": "C64 Palette Post Processing (URP)",
+  "description": "Unity 6 URP Render Graph fullscreen C64 palette quantizer using a 16x1 PNG, Volume settings, dithering and pixelation.",
+  "unity": "6000.0",
+  "keywords": [
+    "urp",
+    "render-graph",
+    "volume",
+    "c64",
+    "palette",
+    "dithering",
+    "post-processing"
+  ],
+  "author": {
+    "name": "UnityCoder",
+    "url": "https://github.com/unitycoder"
+  },
+  "dependencies": {
+    "com.unity.render-pipelines.universal": "17.0.0"
+  },
+  "documentationUrl": "https://github.com/unitycoder/com.unitycoder.c64paletteforunity#readme",
+  "changelogUrl": "https://github.com/unitycoder/com.unitycoder.c64paletteforunity/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/unitycoder/com.unitycoder.c64paletteforunity/blob/main/LICENSE"
+}
