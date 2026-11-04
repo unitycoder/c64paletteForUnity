@@ -20,7 +20,7 @@
   "dependencies": {
     "com.unity.render-pipelines.universal": "17.0.0"
   },
-  "documentationUrl": "https://github.com/unitycoder/com.unitycoder.c64paletteforunity#readme",
-  "changelogUrl": "https://github.com/unitycoder/com.unitycoder.c64paletteforunity/blob/main/CHANGELOG.md",
-  "licensesUrl": "https://github.com/unitycoder/com.unitycoder.c64paletteforunity/blob/main/LICENSE"
+  "documentationUrl": "https://github.com/unitycoder/c64paletteforunity#readme",
+  "changelogUrl": "https://github.com/unitycoder/c64paletteforunity/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/unitycoder/c64paletteforunity/blob/main/LICENSE"
 }

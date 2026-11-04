@@ -11,19 +11,19 @@ A Commodore 64-inspired palette quantization effect for **Unity 6 / Universal Re
 3. Paste this URL:
 
    ```text
-   https://github.com/unitycoder/com.unitycoder.c64paletteforunity.git
+   https://github.com/unitycoder/c64paletteforunity.git
    ```
 
 4. Click **Install** (or **Add**).
 
-**Git install URL:** https://github.com/unitycoder/com.unitycoder.c64paletteforunity.git
+**Git install URL:** https://github.com/unitycoder/c64paletteforunity.git
 
 The URL works **after this repository has been published** under the `unitycoder` GitHub account with the repository name `com.unitycoder.c64palette`. If you publish it under another account or name, update the URL above and the URLs in `package.json`.
 
 To pin a specific tagged release (once you create the tag `v1.0.0`), use:
 
 ```text
-https://github.com/unitycoder/com.unitycoder.c64paletteforunity.git#v1.0.0
+https://github.com/unitycoder/c64paletteforunity.git#v1.0.0
 ```
 
 Alternatively, clone/download the repo and use **+ > Add package from disk...** pointing to the repository-root `package.json`.
@@ -31,7 +31,7 @@ Alternatively, clone/download the repo and use **+ > Add package from disk...** 
 You can also add the following entry to your Unity project's `Packages/manifest.json` dependencies:
 
 ```json
-"com.unitycoder.c64palette": "https://github.com/unitycoder/com.unitycoder.c64paletteforunity.git"
+"com.unitycoder.c64palette": "https://github.com/unitycoder/c64paletteforunity.git"
 ```
 
 ### Requirements
