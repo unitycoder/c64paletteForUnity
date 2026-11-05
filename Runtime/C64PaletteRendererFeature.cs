@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.RenderGraphModule.Util;
@@ -26,7 +27,7 @@ namespace UnityCoder.C64Palette
             generatedPalette = CreateBuiltinPalette();
 
             material = effectShader != null ? CoreUtils.CreateEngineMaterial(effectShader) : null;
-            renderPass = material != null ? new C64PalettePass(material, defaultPalette != null ? defaultPalette : generatedPalette) : null;
+            renderPass = material != null ? new C64PalettePass(material, generatedPalette) : null;
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
@@ -75,7 +76,7 @@ namespace UnityCoder.C64Palette
                 new Color32(160, 87, 163, 255)
             };
 
-            Texture2D texture = new Texture2D(16, 1, TextureFormat.RGBA32, false, false);
+            Texture2D texture = new Texture2D(16, 1, TextureFormat.RGBA32, false, true);
             texture.name = "C64 Palette (Runtime)";
             texture.filterMode = FilterMode.Point;
             texture.wrapMode = TextureWrapMode.Clamp;
@@ -88,6 +89,9 @@ namespace UnityCoder.C64Palette
         private sealed class C64PalettePass : ScriptableRenderPass
         {
             private static readonly int PaletteId = Shader.PropertyToID("_PaletteTex");
+            private static readonly int PaletteCountId = Shader.PropertyToID("_PaletteCount");
+            private static readonly int PaletteHorizontalId = Shader.PropertyToID("_PaletteHorizontal");
+            private static readonly int PaletteSRGBId = Shader.PropertyToID("_PaletteIsSRGB");
             private static readonly int IntensityId = Shader.PropertyToID("_Intensity");
             private static readonly int BrightnessId = Shader.PropertyToID("_Brightness");
             private static readonly int ContrastId = Shader.PropertyToID("_Contrast");
@@ -99,11 +103,14 @@ namespace UnityCoder.C64Palette
 
             private readonly Material material;
             private Texture2D defaultPalette;
+            private readonly Texture2D builtinPalette;
+            private Texture lastInvalidPalette;
 
-            public C64PalettePass(Material material, Texture2D defaultPalette)
+            public C64PalettePass(Material material, Texture2D builtinPalette)
             {
                 this.material = material;
-                this.defaultPalette = defaultPalette;
+                this.builtinPalette = builtinPalette;
+                defaultPalette = builtinPalette;
                 renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 
                 // Force a texture-backed color target so that the screen can be read.
@@ -118,7 +125,20 @@ namespace UnityCoder.C64Palette
                 if (settings == null || !settings.IsActive()) return;
 
                 Texture palette = settings.palette.value != null ? settings.palette.value : defaultPalette;
-                if (palette == null || palette.width != 16 || palette.height != 1) return;
+                if (!TryGetPaletteLayout(palette, out int colorCount, out bool horizontal))
+                {
+                    if (palette != null && lastInvalidPalette != palette)
+                    {
+                        Debug.LogWarning($"Palette Quantizer: '{palette.name}' is {palette.width}x{palette.height}. Use an N x 1 or 1 x N texture with 2 to 256 pixels. Falling back to the included 16-color palette.");
+                        lastInvalidPalette = palette;
+                    }
+                    palette = builtinPalette;
+                    if (!TryGetPaletteLayout(palette, out colorCount, out horizontal)) return;
+                }
+                else
+                {
+                    lastInvalidPalette = null;
+                }
 
                 UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
                 UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
@@ -138,6 +158,11 @@ namespace UnityCoder.C64Palette
                 if (!destination.IsValid()) return;
 
                 material.SetTexture(PaletteId, palette);
+                material.SetInt(PaletteCountId, colorCount);
+                material.SetInt(PaletteHorizontalId, horizontal ? 1 : 0);
+                // Unity automatically decodes sRGB textures on read. Raw palette data
+                // avoids conversion for every candidate in a 256-color search.
+                material.SetFloat(PaletteSRGBId, GraphicsFormatUtility.IsSRGBFormat(palette.graphicsFormat) ? 1f : 0f);
                 material.SetFloat(IntensityId, settings.intensity.value);
                 material.SetFloat(BrightnessId, settings.brightness.value);
                 material.SetFloat(ContrastId, settings.contrast.value);
@@ -152,6 +177,17 @@ namespace UnityCoder.C64Palette
 
                 // The next URP pass (usually Final Blit) consumes this result.
                 resourceData.cameraColor = destination;
+            }
+
+            private static bool TryGetPaletteLayout(Texture palette, out int colorCount, out bool horizontal)
+            {
+                colorCount = 0;
+                horizontal = true;
+                if (palette == null || palette.dimension != TextureDimension.Tex2D) return false;
+                horizontal = palette.height == 1;
+                if (!horizontal && palette.width != 1) return false;
+                colorCount = horizontal ? palette.width : palette.height;
+                return colorCount >= 2 && colorCount <= 256;
             }
         }
     }

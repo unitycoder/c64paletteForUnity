@@ -8,10 +8,10 @@ namespace UnityCoder.C64Palette
     [VolumeComponentMenu("Post-processing/C64 Palette")]
     public sealed class C64PaletteVolume : VolumeComponent, IPostProcessComponent
     {
-        [Tooltip("Enable the C64 palette effect. Check this parameter's override box in the Volume Profile.")]
+        [Tooltip("Enable the palette quantization effect. Check this parameter's override box in the Volume Profile.")]
         public BoolParameter enabled = new BoolParameter(false);
 
-        [Tooltip("Optional custom 16 x 1 palette PNG. Leave empty to use the bundled Commodore 64 palette.")]
+        [Tooltip("Optional palette PNG: 2 to 256 colors in one row or column (N x 1 or 1 x N). Leave empty for the bundled 16-color C64 palette.")]
         public TextureParameter palette = new TextureParameter(null);
 
         [Tooltip("0 = original camera colors, 1 = palette colors only.")]

@@ -24,6 +24,10 @@ Shader "Hidden/UnityCoder/C64PaletteQuantize"
 
             TEXTURE2D(_PaletteTex);
 
+            int _PaletteCount;
+            int _PaletteHorizontal;
+            float _PaletteIsSRGB;
+
             float _Intensity;
             float _Brightness;
             float _Contrast;
@@ -39,6 +43,26 @@ Shader "Hidden/UnityCoder/C64PaletteQuantize"
                     return saturate(color);
                 #else
                     return LinearToSRGB(saturate(color));
+                #endif
+            }
+
+            float3 PaletteMatchColor(float3 paletteSample)
+            {
+                #if defined(UNITY_COLORSPACE_GAMMA)
+                    return paletteSample;
+                #else
+                    // sRGB textures are decoded by hardware. Raw textures contain
+                    // sRGB bytes and avoid an expensive conversion per palette entry.
+                    return _PaletteIsSRGB > 0.5 ? LinearToSRGB(saturate(paletteSample)) : paletteSample;
+                #endif
+            }
+
+            float3 PaletteOutputColor(float3 paletteSample)
+            {
+                #if defined(UNITY_COLORSPACE_GAMMA)
+                    return paletteSample;
+                #else
+                    return _PaletteIsSRGB > 0.5 ? paletteSample : SRGBToLinear(saturate(paletteSample));
                 #endif
             }
 
@@ -85,22 +109,23 @@ Shader "Hidden/UnityCoder/C64PaletteQuantize"
 
                 float3 weights = lerp(float3(1.0, 1.0, 1.0), float3(2.0, 4.0, 3.0), _ColorWeighting);
                 float closestDistance = 1e20;
-                float3 closestLinearRGB = 0.0;
+                float3 closestPaletteSample = 0.0;
+                int2 paletteStep = int2(_PaletteHorizontal, 1 - _PaletteHorizontal);
 
-                [unroll]
-                for (int i = 0; i < 16; ++i)
+                [loop]
+                for (int i = 0; i < _PaletteCount; ++i)
                 {
-                    float3 paletteColor = LOAD_TEXTURE2D(_PaletteTex, int2(i, 0)).rgb;
-                    float3 difference = target - ToMatchSpace(paletteColor);
+                    float3 paletteColor = LOAD_TEXTURE2D(_PaletteTex, i * paletteStep).rgb;
+                    float3 difference = target - PaletteMatchColor(paletteColor);
                     float distanceSquared = dot(difference * difference, weights);
                     if (distanceSquared < closestDistance)
                     {
                         closestDistance = distanceSquared;
-                        closestLinearRGB = paletteColor;
+                        closestPaletteSample = paletteColor;
                     }
                 }
 
-                return float4(lerp(source.rgb, closestLinearRGB, _Intensity), source.a);
+                return float4(lerp(source.rgb, PaletteOutputColor(closestPaletteSample), _Intensity), source.a);
             }
             ENDHLSL
         }

@@ -32,4 +32,10 @@ jobs:
           png = (root / 'Runtime/Resources/C64Palette16.png').read_bytes()
           assert png[:8] == b'\x89PNG\r\n\x1a\n'
           assert struct.unpack('>II', png[16:24]) == (16, 1)
-          print('Manifest, sources, asset metadata and 16x1 PNG validated.')
+          shader = (root / 'Runtime/Resources/C64PaletteQuantize.shader').read_text(encoding='utf-8')
+          feature = (root / 'Runtime/C64PaletteRendererFeature.cs').read_text(encoding='utf-8')
+          assert 'i < _PaletteCount' in shader
+          assert 'int2(_PaletteHorizontal, 1 - _PaletteHorizontal)' in shader
+          assert 'colorCount >= 2 && colorCount <= 256' in feature
+          assert 'GraphicsFormatUtility.IsSRGBFormat' in feature
+          print('Manifest, sources, dynamic palette search, asset metadata and bundled C64 PNG validated.')
