@@ -1,4 +1,8 @@
+<img src="https://img.shields.io/badge/VibeCoded-100%25-green" alt="AI Generated Content"/>
+
 # Palette Quantization Post Processing (URP)
+
+<img width="2560" height="1400" alt="c64Untitled" src="https://github.com/user-attachments/assets/edb804f3-864b-44e7-bbba-2742e6e2d1c5" />
 
 A Commodore 64-inspired **custom palette quantization effect** for **Unity 6 / Universal Render Pipeline (URP)** using **Render Graph**. Assign a palette strip containing **2 to 256 colors** (horizontal or vertical). Every camera pixel is mapped to its closest palette color, with optional ordered dithering, pixelation, and Volume-controlled color adjustments. If no palette is assigned, the bundled C64 16-color palette is used.
 
