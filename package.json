@@ -1,5 +1,5 @@
 {
-  "name": "c64paletteforunity",
+  "name": "com.unitycoder.c64palette",
   "version": "1.1.0",
   "displayName": "C64 Palette Post Processing (URP)",
   "description": "Unity 6 URP Render Graph fullscreen palette quantization using any 2-256 color strip PNG (Nx1 or 1xN), Volume settings, dithering and pixelation.",
